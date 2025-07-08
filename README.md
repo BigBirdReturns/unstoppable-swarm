@@ -1,86 +1,113 @@
 # 🛰️ Unstoppable v2 – Open Source AI Swarm Framework
 
-A local-first, agent-coordinated, modular AI orchestration system designed for real-world transparency, resilience, and zero dependency on cloud services.
+A local-first, agent-coordinated, modular AI orchestration system designed for real-world transparency, resilience, and **zero dependency on cloud services**.
 
-## 🧠 What This Is
+---
 
-**Unstoppable v2** implements:
-- Multi-agent coordination with LoRA personas and scoped memory
-- Full local inference using open LLMs via `llama.cpp`
-- Retrieval-augmented rehydration using vector memory (Spectra RAG)
-- Optional trustless append-only audit trail (Spectra’s ITL ledger)
-- Streamlit-based UI for demo and debugging
-- Hierarchical swarm orchestration, parallel execution, and persona overlays
+## ✅ System Status
+
+This repo contains the **working implementation** of Unstoppable v2:
+
+- 🔁 **Planner → Coder → Verifier** agent loop
+- 🧠 **Spectra Rehydration Paradigm** (compressed vector memory → rehydrated answers)
+- 🧮 **LLM inference powered by llama.cpp** (offline `.gguf` model)
+- 🧾 Fully inspectable prompt construction + output verification
+- 💻 Zero external API calls. **All execution is local**.
+- 🔧 Runs on CPU or GPU using quantized models like `mistral-7b-instruct-v0.2.Q4_K_M.gguf`
+
+---
 
 ## 📂 Directory Structure
 
 ```
 unstoppable-swarm/
-├── cli.py
+├── cli.py                     # Main entry point for swarm execution
 ├── README.md
 ├── LICENSE
 ├── .gitignore
+├── models/                    # Place your .gguf model here (e.g. mistral-7b-instruct-v0.2.Q4_K_M.gguf)
+├── data/
+│   └── docs/                  # Optional custom doctrine fragments
 ├── src/
-│   ├── agents/
+│   ├── agents/                # All agent logic
 │   │   ├── planner_agent.py
-│   │   ├── coder_agent.py
-│   │   └── verifier_agent.py
+│   │   ├── coder_agent.py     ← Uses rehydration + LLM inference
+│   │   ├── verifier_agent.py
+│   │   └── llm.py             ← llama.cpp wrapper
 │   ├── orchestrator/
 │   │   ├── orchestrator.py
 │   │   └── agent_interface.py
 │   ├── memory/
-│   │   ├── vector_store.py
-│   │   ├── rehydrate.py
-│   │   └── ingest.py
-│   ├── ledger/
-│   │   ├── ledger.py
-│   │   └── reputation.py
-│   ├── semantic/
-│   │   └── field_zero.py
-│   ├── utils/
-│   │   └── logger.py
-│   └── personas/
-│       └── [LoRA adapters, metadata, etc.]
-├── data/
-│   ├── docs/
-│   └── tokens/
-├── models/
-│   └── [gguf model files]
-├── ui/
-│   └── app.py
-├── requirements.txt
-├── Dockerfile
+│   │   ├── ingest.py          ← Loads doctrine into Chroma vector DB
+│   │   ├── vector_store.py    ← Chroma wrapper
+│   │   └── rehydrate.py       ← Query+prompt builder
 ```
 
-## 🚀 Quick Start
+---
 
-Run a sample CLI swarm task:
+## 🚀 How to Run It
 
+### 1. Install requirements (in a fresh `.venv`)
+```bash
+pip install -r requirements.txt
+```
+
+Or manually:
+```bash
+pip install llama-cpp-python chromadb sentence-transformers numpy
+```
+
+### 2. Download a `.gguf` model
+Recommended:
+- [`mistral-7b-instruct-v0.2.Q4_K_M.gguf`](https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF)
+
+Place it in:
+```
+models/mistral-7b-instruct-v0.2.Q4_K_M.gguf
+```
+
+### 3. Ingest doctrine into memory
+```bash
+python -m src.memory.ingest
+```
+
+### 4. Run the CLI swarm
 ```bash
 python cli.py
 ```
 
-You should see:
+---
 
+## 🧠 Example Prompt
+
+```text
+> Explain Spectra’s collapse-and-rehydration memory design in plain English.
 ```
-Unstoppable v2 CLI scaffold: Swarm orchestrator loading soon.
-```
 
-## 📦 Goals
+✔️ Context will be retrieved from vector memory  
+✔️ Coder agent rehydrates it into a full answer  
+✔️ Verifier signs off on the result  
 
-- ✅ Swarm CLI scaffold
-- ✅ Local vector memory
-- ✅ Signed trust log prototype
-- 🛠️ Agents with role + persona overlays
-- 🛠️ Streamlit swarm panel
-- 🛠️ Multisig & CRDT sync in ITL ledger
+---
 
-## 🧠 Philosophy
+## 🛤️ Roadmap
 
-No prompt-stuffing. No black-box cloud. No silent drift.  
-You can inspect every retrieval, every token, every log entry.
+The following components are modular and will be layered in next:
 
-Sovereign, semantic, swarm-native.
+- 🧾 ITL Ledger (trustless append-only log)
+- 🧠 Field Zero drift/fork/tension tracker
+- 🖥️ Streamlit UI (multi-agent dashboard)
+- 🧩 Persona overlays (LoRA adapters per agent)
+
+---
+
+## 🧭 Philosophy
+
+No prompt-stuffing.  
+No cloud hallucinations.  
+No startup required.
+
+This is **sovereign AI** — embedded memory, post-cloud execution, and transparent reasoning.
 
 ---
 
